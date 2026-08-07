@@ -64,26 +64,17 @@ def apply_custom_theme(glow_color="#0D1532"):
 
         /* Completely Nuke Top Gradient Line, Header Bar, and Three-Dots Toolbar */
         header,
+        header *,
         [data-testid="stHeader"],
+        [data-testid="stHeader"] *,
         [data-testid="stDecoration"],
+        [data-testid="stDecoration"] *,
         div[data-testid="stDecoration"],
         div[class*="stDecoration"],
         .stDecoration,
         header::before,
         [data-testid="stHeader"]::before,
-        [data-testid="stHeader"] * {
-            background: none !important;
-            background-color: transparent !important;
-            background-image: none !important;
-            border: none !important;
-            box-shadow: none !important;
-        }
-
-        header[data-testid="stHeader"],
-        [data-testid="stDecoration"],
-        div[data-testid="stDecoration"],
-        div[class*="stDecoration"],
-        .stDecoration {
+        [data-testid="stHeader"]::after {
             display: none !important;
             visibility: hidden !important;
             height: 0px !important;
@@ -91,6 +82,11 @@ def apply_custom_theme(glow_color="#0D1532"):
             max-height: 0px !important;
             opacity: 0 !important;
             pointer-events: none !important;
+            background: none !important;
+            background-color: transparent !important;
+            background-image: none !important;
+            border: none !important;
+            box-shadow: none !important;
         }
 
         #MainMenu,
@@ -106,6 +102,26 @@ def apply_custom_theme(glow_color="#0D1532"):
             height: 0px !important;
             pointer-events: none !important;
         }
+
+        [data-testid="stAppViewContainer"] {
+            padding-top: 0px !important;
+        }
+    </style>
+    <script>
+        const hideHeaderAndLine = () => {
+            const els = document.querySelectorAll('header, [data-testid="stHeader"], [data-testid="stDecoration"], #MainMenu, [data-testid="stToolbar"], [class*="stDecoration"]');
+            els.forEach(el => {
+                if (el) {
+                    el.style.setProperty('display', 'none', 'important');
+                    el.style.setProperty('visibility', 'hidden', 'important');
+                    el.style.setProperty('height', '0px', 'important');
+                    el.style.setProperty('background', 'none', 'important');
+                }
+            });
+        };
+        hideHeaderAndLine();
+        setInterval(hideHeaderAndLine, 150);
+    </script>
 
         html, body, [class*="css"] {
             font-family: 'Outfit', sans-serif !important;
