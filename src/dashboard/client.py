@@ -351,11 +351,18 @@ class FraudAPIClient:
                 headers=self.headers,
                 timeout=5.0,
             )
-            if r.status_code == 201:
+            if r.status_code in [200, 201]:
                 return r.json()
             else:
-                detail = r.json().get("detail", "Registration failed")
-                return {"error": detail}
+                try:
+                    err_data = r.json()
+                    detail = err_data.get("detail", "Registration failed")
+                    if isinstance(detail, list):
+                        detail_msgs = [f"{item.get('loc', [])[-1]}: {item.get('msg', '')}" for item in detail]
+                        detail = " | ".join(detail_msgs)
+                    return {"error": str(detail)}
+                except Exception:
+                    return {"error": f"API HTTP {r.status_code}: {r.text}"}
         except Exception as e:
             return {"error": str(e)}
 
