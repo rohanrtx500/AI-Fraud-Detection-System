@@ -339,17 +339,123 @@ class FraudAPIClient:
         elif "Authorization" in self.headers:
             del self.headers["Authorization"]
 
+    def _direct_db_register(self, username: str, password: str, role: str) -> dict:
+        import asyncio
+        import concurrent.futures
+        import random
+        import re
+        from sqlalchemy import select
+        from src.api.security import get_password_hash
+        from src.database.connection import initialize_db, create_tables, _session_factory
+        from src.database.models import User
+
+        if len(password) < 8:
+            return {"error": "Password must be at least 8 characters long."}
+        if not re.search(r"[A-Z]", password):
+            return {"error": "Password must contain at least one uppercase letter."}
+        if not re.search(r"[a-z]", password):
+            return {"error": "Password must contain at least one lowercase letter."}
+        if not re.search(r"[0-9]", password):
+            return {"error": "Password must contain at least one number."}
+        if not re.search(r"[!@#$%^&*(),.?\":{}|<>]", password):
+            return {"error": "Password must contain at least one special character (!@#$%^&* etc.)."}
+
+        async def _async_reg():
+            db_url = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///data/fraud_detection_db.db")
+            if _session_factory is None:
+                initialize_db(db_url)
+                await create_tables()
+
+            async with _session_factory() as db:
+                role_prefix_map = {"Compliance Officer": "CO", "Analyst": "AN", "Auditor": "AU"}
+                role_prefix = role_prefix_map.get(role, "AN")
+                role_id = None
+                for _ in range(100):
+                    candidate_id = f"{role_prefix}-{random.randint(1000, 9999)}"
+                    res = await db.execute(select(User).where(User.role_id == candidate_id))
+                    if res.scalars().first() is None:
+                        role_id = candidate_id
+                        break
+
+                clean_name = " ".join(username.strip().split())
+                new_user = User(
+                    username=clean_name,
+                    hashed_password=get_password_hash(password),
+                    role=role,
+                    role_id=role_id,
+                )
+                db.add(new_user)
+                await db.commit()
+                await db.refresh(new_user)
+                return {
+                    "username": new_user.username,
+                    "role": new_user.role,
+                    "id": str(new_user.id),
+                    "role_id": new_user.role_id,
+                    "created_at": new_user.created_at.isoformat(),
+                }
+
+        try:
+            return asyncio.run(_async_reg())
+        except Exception:
+            try:
+                with concurrent.futures.ThreadPoolExecutor() as pool:
+                    return pool.submit(lambda: asyncio.run(_async_reg())).result()
+            except Exception as ex:
+                return {"error": f"Database registration failed: {str(ex)}"}
+
+    def _direct_db_login(self, role_id: str, password: str) -> dict:
+        import asyncio
+        import concurrent.futures
+        from datetime import timedelta
+        from sqlalchemy import select
+        from src.api.security import ACCESS_TOKEN_EXPIRE_MINUTES, create_access_token, verify_password
+        from src.database.connection import initialize_db, _session_factory
+        from src.database.models import User
+
+        async def _async_log():
+            db_url = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///data/fraud_detection_db.db")
+            if _session_factory is None:
+                initialize_db(db_url)
+
+            async with _session_factory() as db:
+                res = await db.execute(select(User).where(User.role_id == role_id.strip()))
+                user = res.scalars().first()
+                if not user or not verify_password(password, user.hashed_password):
+                    return {"error": "Incorrect Role ID or password combination"}
+
+                token = create_access_token(
+                    data={"sub": user.role_id, "role": user.role},
+                    expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
+                )
+                return {
+                    "access_token": token,
+                    "token_type": "bearer",
+                    "role": user.role,
+                    "username": user.username,
+                    "role_id": user.role_id,
+                }
+
+        try:
+            return asyncio.run(_async_log())
+        except Exception:
+            try:
+                with concurrent.futures.ThreadPoolExecutor() as pool:
+                    return pool.submit(lambda: asyncio.run(_async_log())).result()
+            except Exception as ex:
+                return {"error": f"Database login failed: {str(ex)}"}
+
     def register_user(self, username: str, password: str, role: str) -> dict:
         """
         Registers a new compliance dashboard user.
-        Calls POST /auth/register
+        Calls POST /auth/register with automatic direct database fallback.
         """
         try:
             r = httpx.post(
                 f"{self.base_url}/auth/register",
                 json={"username": username, "password": password, "role": role},
                 headers=self.headers,
-                timeout=5.0,
+                timeout=3.0,
             )
             if r.status_code in [200, 201]:
                 return r.json()
@@ -363,26 +469,30 @@ class FraudAPIClient:
                     return {"error": str(detail)}
                 except Exception:
                     return {"error": f"API HTTP {r.status_code}: {r.text}"}
-        except Exception as e:
-            return {"error": str(e)}
+        except (httpx.ConnectError, httpx.ConnectTimeout, Exception):
+            return self._direct_db_register(username, password, role)
 
     def login_user(self, role_id: str, password: str) -> dict:
         """
         Obtains a JWT access token for a user.
-        Calls POST /auth/token
+        Calls POST /auth/token with automatic direct database fallback.
         """
         try:
             r = httpx.post(
                 f"{self.base_url}/auth/token",
                 data={"username": role_id, "password": password},
                 headers=self.headers,
-                timeout=5.0,
+                timeout=3.0,
             )
             if r.status_code == 200:
                 return r.json()
             else:
-                detail = r.json().get("detail", "Login failed")
-                return {"error": detail}
-        except Exception as e:
-            return {"error": str(e)}
+                try:
+                    err_data = r.json()
+                    detail = err_data.get("detail", "Login failed")
+                    return {"error": str(detail)}
+                except Exception:
+                    return {"error": f"API HTTP {r.status_code}: {r.text}"}
+        except (httpx.ConnectError, httpx.ConnectTimeout, Exception):
+            return self._direct_db_login(role_id, password)
 
