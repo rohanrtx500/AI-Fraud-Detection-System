@@ -106,22 +106,6 @@ def apply_custom_theme(glow_color="#0D1532"):
         [data-testid="stAppViewContainer"] {
             padding-top: 0px !important;
         }
-    </style>
-    <script>
-        const hideHeaderAndLine = () => {
-            const els = document.querySelectorAll('header, [data-testid="stHeader"], [data-testid="stDecoration"], #MainMenu, [data-testid="stToolbar"], [class*="stDecoration"]');
-            els.forEach(el => {
-                if (el) {
-                    el.style.setProperty('display', 'none', 'important');
-                    el.style.setProperty('visibility', 'hidden', 'important');
-                    el.style.setProperty('height', '0px', 'important');
-                    el.style.setProperty('background', 'none', 'important');
-                }
-            });
-        };
-        hideHeaderAndLine();
-        setInterval(hideHeaderAndLine, 150);
-    </script>
 
         html, body, [class*="css"] {
             font-family: 'Outfit', sans-serif !important;
