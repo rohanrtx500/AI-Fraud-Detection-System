@@ -39,12 +39,6 @@ if "user_token" not in st.session_state:
             [data-testid="collapsedControl"] {
                 display: none !important;
             }
-            /* Round top corners of landing page images */
-            [data-testid="stImage"] img {
-                border-radius: 12px 12px 0 0 !important;
-                border: 1px solid rgba(255, 255, 255, 0.05) !important;
-                border-bottom: none !important;
-            }
         </style>
         """,
         unsafe_allow_html=True,
@@ -192,13 +186,15 @@ if "user_token" not in st.session_state:
 
     col_info1, col_info2, col_info3 = st.columns(3)
     with col_info1:
-        st.image("src/dashboard/assets/ml_predictive.png", use_container_width=True)
         st.markdown(
             """
-            <div class="glass-card" style="padding: 24px; border-radius: 0 0 12px 12px; margin-top: -10px; min-height: 250px; background: rgba(15, 23, 42, 0.45); border: 1px solid rgba(255, 255, 255, 0.05); border-top: none; animation: fadeInUp 0.4s ease-out both;">
-                <h3 style="color: #06B6D4; font-size: 1.25rem; font-family: Outfit; font-weight: 600; margin-bottom: 12px;">⚡ Real-Time Decisioning</h3>
-                <p style="color: #94A3B8; font-size: 0.95rem; line-height: 1.5; margin: 0;">
-                    Instant automated risk evaluation for every financial transaction. Provides transparent factor attributions explaining risk drivers in sub-10ms.
+            <div class="glass-card" style="padding: 28px; border-radius: 12px; min-height: 220px; background: rgba(15, 23, 42, 0.55); border: 1px solid rgba(255, 255, 255, 0.07); border-top: 3px solid #06B6D4;">
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 14px;">
+                    <span style="font-size: 1.6rem;">⚡</span>
+                    <h3 style="color: #F8FAFC; font-size: 1.2rem; font-family: Outfit; font-weight: 700; margin: 0;">Real-Time Decisioning</h3>
+                </div>
+                <p style="color: #94A3B8; font-size: 0.92rem; line-height: 1.6; margin: 0;">
+                    Instant automated risk evaluation for every financial transaction payload. Delivers transparent decision attributions and risk factor breakdowns in sub-15ms latency SLAs.
                 </p>
             </div>
             """,
@@ -206,13 +202,15 @@ if "user_token" not in st.session_state:
         )
 
     with col_info2:
-        st.image("src/dashboard/assets/network_graph.png", use_container_width=True)
         st.markdown(
             """
-            <div class="glass-card" style="padding: 24px; border-radius: 0 0 12px 12px; margin-top: -10px; min-height: 250px; background: rgba(15, 23, 42, 0.45); border: 1px solid rgba(255, 255, 255, 0.05); border-top: none; animation: fadeInUp 0.5s ease-out both;">
-                <h3 style="color: #10B981; font-size: 1.25rem; font-family: Outfit; font-weight: 600; margin-bottom: 12px;">🕸️ Entity Network Protection</h3>
-                <p style="color: #94A3B8; font-size: 0.95rem; line-height: 1.5; margin: 0;">
-                    Constructs relational transaction networks mapping associations between devices, payment methods, and merchants to uncover fraud rings.
+            <div class="glass-card" style="padding: 28px; border-radius: 12px; min-height: 220px; background: rgba(15, 23, 42, 0.55); border: 1px solid rgba(255, 255, 255, 0.07); border-top: 3px solid #10B981;">
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 14px;">
+                    <span style="font-size: 1.6rem;">🕸️</span>
+                    <h3 style="color: #F8FAFC; font-size: 1.2rem; font-family: Outfit; font-weight: 700; margin: 0;">Entity Network Protection</h3>
+                </div>
+                <p style="color: #94A3B8; font-size: 0.92rem; line-height: 1.6; margin: 0;">
+                    Constructs multi-partite graph networks linking devices, payment accounts, merchants, and IP addresses to automatically uncover coordinated fraud ring syndicates.
                 </p>
             </div>
             """,
@@ -220,13 +218,15 @@ if "user_token" not in st.session_state:
         )
 
     with col_info3:
-        st.image("src/dashboard/assets/security_audit.png", use_container_width=True)
         st.markdown(
             """
-            <div class="glass-card" style="padding: 24px; border-radius: 0 0 12px 12px; margin-top: -10px; min-height: 250px; background: rgba(15, 23, 42, 0.45); border: 1px solid rgba(255, 255, 255, 0.05); border-top: none; animation: fadeInUp 0.6s ease-out both;">
-                <h3 style="color: #F59E0B; font-size: 1.25rem; font-family: Outfit; font-weight: 600; margin-bottom: 12px;">🛡️ Enterprise Governance</h3>
-                <p style="color: #94A3B8; font-size: 0.95rem; line-height: 1.5; margin: 0;">
-                    Enforces zero-trust role-based access control, isolating workspaces for Compliance Officers, Analysts, and Auditors with complete audit logs.
+            <div class="glass-card" style="padding: 28px; border-radius: 12px; min-height: 220px; background: rgba(15, 23, 42, 0.55); border: 1px solid rgba(255, 255, 255, 0.07); border-top: 3px solid #F59E0B;">
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 14px;">
+                    <span style="font-size: 1.6rem;">🛡️</span>
+                    <h3 style="color: #F8FAFC; font-size: 1.2rem; font-family: Outfit; font-weight: 700; margin: 0;">Enterprise Governance</h3>
+                </div>
+                <p style="color: #94A3B8; font-size: 0.92rem; line-height: 1.6; margin: 0;">
+                    Enforces zero-trust role-based access control, isolating workspaces for Compliance Officers, Analysts, and Auditors with complete immutable audit trails.
                 </p>
             </div>
             """,
