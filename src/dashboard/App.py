@@ -22,6 +22,26 @@ st.set_page_config(
 # Apply design system overrides
 apply_custom_theme()
 
+# Ensure FastAPI Backend API is running (spawns background thread if port 8000 is offline)
+@st.cache_resource
+def ensure_backend_api():
+    import socket
+    import time
+    import uvicorn
+
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    res = sock.connect_ex(("127.0.0.1", 8000))
+    sock.close()
+
+    if res != 0:
+        def run_api():
+            uvicorn.run("src.api.main:app", host="127.0.0.1", port=8000, log_level="warning")
+
+        t = threading.Thread(target=run_api, daemon=True)
+        t.start()
+        time.sleep(1.5)
+
+ensure_backend_api()
 
 # Initialize client
 client = FraudAPIClient()
