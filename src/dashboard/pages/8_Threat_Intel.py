@@ -5,7 +5,7 @@ import streamlit as st
 from src.dashboard.client import FraudAPIClient
 from src.dashboard.styles import apply_custom_theme, apply_plotly_theme
 
-st.set_page_config(page_title="Threat Intel Blacklist", page_icon="📡", layout="wide")
+st.set_page_config(page_title="Threat Intel Blacklist", page_icon="📡", layout="wide", initial_sidebar_state="expanded")
 
 apply_custom_theme("#320A0A")
 

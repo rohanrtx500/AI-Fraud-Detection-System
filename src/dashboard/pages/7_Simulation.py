@@ -9,7 +9,12 @@ from src.dashboard.client import FraudAPIClient
 from src.dashboard.styles import apply_custom_theme, apply_plotly_theme
 from src.models.synthetic_engine import SyntheticFraudEngine
 
-st.set_page_config(page_title="Fraud Simulation Lab", page_icon="🧪", layout="wide")
+st.set_page_config(
+    page_title="Volume Load Desk",
+    page_icon="⚡",
+    layout="wide",
+    initial_sidebar_state="expanded",
+)
 
 apply_custom_theme("#2E1E0A")
 

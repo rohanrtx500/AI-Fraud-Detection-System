@@ -9,7 +9,7 @@ from src.dashboard.client import FraudAPIClient
 from src.dashboard.styles import apply_custom_theme, apply_plotly_theme
 
 # Page configuration
-st.set_page_config(page_title="Investigation Workspace", page_icon="🚨", layout="wide")
+st.set_page_config(page_title="Investigation Workspace", page_icon="🚨", layout="wide", initial_sidebar_state="expanded")
 
 apply_custom_theme("#2A0A15")
 
