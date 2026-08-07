@@ -900,6 +900,23 @@ def render_custom_sidebar():
     if "user_token" not in st.session_state:
         return None
 
+    # Force sidebar to display when user is authenticated
+    st.markdown(
+        """
+        <style>
+            [data-testid="stSidebar"] {
+                display: block !important;
+                visibility: visible !important;
+            }
+            [data-testid="collapsedControl"] {
+                display: flex !important;
+                visibility: visible !important;
+            }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
     # Pre-allocate containers to enforce layout hierarchy
     nav_container = st.sidebar.container()
     controls_container = st.sidebar.container()
