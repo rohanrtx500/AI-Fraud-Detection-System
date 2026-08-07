@@ -4,3 +4,8 @@ backgroundColor = "#060814"
 secondaryBackgroundColor = "#0B0F19"
 textColor = "#F8FAFC"
 font = "sans serif"
+
+[client]
+toolbarMode = "viewer"
+showErrorDetails = false
+

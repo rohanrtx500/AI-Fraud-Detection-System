@@ -62,6 +62,19 @@ def apply_custom_theme(glow_color="#0D1532"):
             background-color: transparent !important;
         }
 
+        /* Completely Hide Top Gradient Line, Header Bar, and Three-Dots Menu */
+        header[data-testid="stHeader"], [data-testid="stDecoration"] {
+            display: none !important;
+            visibility: hidden !important;
+            height: 0 !important;
+            background: none !important;
+        }
+
+        #MainMenu, [data-testid="stMainMenu"], [data-testid="stToolbar"], footer {
+            display: none !important;
+            visibility: hidden !important;
+        }
+
         html, body, [class*="css"] {
             font-family: 'Outfit', sans-serif !important;
             color: #F8FAFC !important;
