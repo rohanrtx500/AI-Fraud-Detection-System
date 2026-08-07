@@ -39,6 +39,11 @@ if "user_token" not in st.session_state:
             [data-testid="collapsedControl"] {
                 display: none !important;
             }
+            header, [data-testid="stHeader"], [data-testid="stDecoration"], #MainMenu, [data-testid="stToolbar"] {
+                display: none !important;
+                visibility: hidden !important;
+                height: 0px !important;
+            }
         </style>
         """,
         unsafe_allow_html=True,
