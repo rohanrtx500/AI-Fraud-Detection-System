@@ -340,14 +340,13 @@ class FraudAPIClient:
             del self.headers["Authorization"]
 
     def _direct_db_register(self, username: str, password: str, role: str) -> dict:
-        import asyncio
-        import concurrent.futures
+        import os
         import random
         import re
-        from sqlalchemy import select
+        import sqlite3
+        import uuid
+        from datetime import datetime
         from src.api.security import get_password_hash
-        from src.database.connection import initialize_db, create_tables, _session_factory
-        from src.database.models import User
 
         if len(password) < 8:
             return {"error": "Password must be at least 8 characters long."}
@@ -360,90 +359,99 @@ class FraudAPIClient:
         if not re.search(r"[!@#$%^&*(),.?\":{}|<>]", password):
             return {"error": "Password must contain at least one special character (!@#$%^&* etc.)."}
 
-        async def _async_reg():
-            db_url = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///data/fraud_detection_db.db")
-            if _session_factory is None:
-                initialize_db(db_url)
-                await create_tables()
-
-            async with _session_factory() as db:
-                role_prefix_map = {"Compliance Officer": "CO", "Analyst": "AN", "Auditor": "AU"}
-                role_prefix = role_prefix_map.get(role, "AN")
-                role_id = None
-                for _ in range(100):
-                    candidate_id = f"{role_prefix}-{random.randint(1000, 9999)}"
-                    res = await db.execute(select(User).where(User.role_id == candidate_id))
-                    if res.scalars().first() is None:
-                        role_id = candidate_id
-                        break
-
-                clean_name = " ".join(username.strip().split())
-                new_user = User(
-                    username=clean_name,
-                    hashed_password=get_password_hash(password),
-                    role=role,
-                    role_id=role_id,
-                )
-                db.add(new_user)
-                await db.commit()
-                await db.refresh(new_user)
-                return {
-                    "username": new_user.username,
-                    "role": new_user.role,
-                    "id": str(new_user.id),
-                    "role_id": new_user.role_id,
-                    "created_at": new_user.created_at.isoformat(),
-                }
-
         try:
-            return asyncio.run(_async_reg())
-        except Exception:
-            try:
-                with concurrent.futures.ThreadPoolExecutor() as pool:
-                    return pool.submit(lambda: asyncio.run(_async_reg())).result()
-            except Exception as ex:
-                return {"error": f"Database registration failed: {str(ex)}"}
+            db_path = os.getenv("DATABASE_FILE", "data/fraud_detection_db.db")
+            os.makedirs(os.path.dirname(db_path) or ".", exist_ok=True)
+
+            conn = sqlite3.connect(db_path)
+            cur = conn.cursor()
+            cur.execute(
+                """
+                CREATE TABLE IF NOT EXISTS users (
+                    id VARCHAR(36) PRIMARY KEY,
+                    username VARCHAR(50) NOT NULL,
+                    hashed_password VARCHAR(255) NOT NULL,
+                    role VARCHAR(30) NOT NULL,
+                    role_id VARCHAR(20) UNIQUE,
+                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                )
+                """
+            )
+
+            role_prefix_map = {"Compliance Officer": "CO", "Analyst": "AN", "Auditor": "AU"}
+            role_prefix = role_prefix_map.get(role, "AN")
+
+            role_id = None
+            for _ in range(100):
+                candidate_id = f"{role_prefix}-{random.randint(1000, 9999)}"
+                cur.execute("SELECT id FROM users WHERE role_id = ?", (candidate_id,))
+                if cur.fetchone() is None:
+                    role_id = candidate_id
+                    break
+
+            user_id = str(uuid.uuid4())
+            clean_name = " ".join(username.strip().split())
+            hashed_pwd = get_password_hash(password)
+            now_str = datetime.utcnow().isoformat()
+
+            cur.execute(
+                "INSERT INTO users (id, username, hashed_password, role, role_id, created_at) VALUES (?, ?, ?, ?, ?, ?)",
+                (user_id, clean_name, hashed_pwd, role, role_id, now_str),
+            )
+            conn.commit()
+            conn.close()
+
+            return {
+                "username": clean_name,
+                "role": role,
+                "id": user_id,
+                "role_id": role_id,
+                "created_at": now_str,
+            }
+        except Exception as ex:
+            return {"error": f"Database registration failed: {str(ex)}"}
 
     def _direct_db_login(self, role_id: str, password: str) -> dict:
-        import asyncio
-        import concurrent.futures
+        import os
+        import sqlite3
         from datetime import timedelta
-        from sqlalchemy import select
-        from src.api.security import ACCESS_TOKEN_EXPIRE_MINUTES, create_access_token, verify_password
-        from src.database.connection import initialize_db, _session_factory
-        from src.database.models import User
-
-        async def _async_log():
-            db_url = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///data/fraud_detection_db.db")
-            if _session_factory is None:
-                initialize_db(db_url)
-
-            async with _session_factory() as db:
-                res = await db.execute(select(User).where(User.role_id == role_id.strip()))
-                user = res.scalars().first()
-                if not user or not verify_password(password, user.hashed_password):
-                    return {"error": "Incorrect Role ID or password combination"}
-
-                token = create_access_token(
-                    data={"sub": user.role_id, "role": user.role},
-                    expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
-                )
-                return {
-                    "access_token": token,
-                    "token_type": "bearer",
-                    "role": user.role,
-                    "username": user.username,
-                    "role_id": user.role_id,
-                }
+        from src.api.security import (
+            ACCESS_TOKEN_EXPIRE_MINUTES,
+            create_access_token,
+            verify_password,
+        )
 
         try:
-            return asyncio.run(_async_log())
-        except Exception:
-            try:
-                with concurrent.futures.ThreadPoolExecutor() as pool:
-                    return pool.submit(lambda: asyncio.run(_async_log())).result()
-            except Exception as ex:
-                return {"error": f"Database login failed: {str(ex)}"}
+            db_path = os.getenv("DATABASE_FILE", "data/fraud_detection_db.db")
+            conn = sqlite3.connect(db_path)
+            cur = conn.cursor()
+            cur.execute(
+                "SELECT id, username, hashed_password, role, role_id FROM users WHERE role_id = ?",
+                (role_id.strip(),),
+            )
+            row = cur.fetchone()
+            conn.close()
+
+            if not row:
+                return {"error": "Incorrect Role ID or password combination"}
+
+            u_id, username, hashed_pwd, role, u_role_id = row
+            if not verify_password(password, hashed_pwd):
+                return {"error": "Incorrect Role ID or password combination"}
+
+            token = create_access_token(
+                data={"sub": u_role_id, "role": role},
+                expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
+            )
+            return {
+                "access_token": token,
+                "token_type": "bearer",
+                "role": role,
+                "username": username,
+                "role_id": u_role_id,
+            }
+        except Exception as ex:
+            return {"error": f"Database login failed: {str(ex)}"}
 
     def register_user(self, username: str, password: str, role: str) -> dict:
         """
