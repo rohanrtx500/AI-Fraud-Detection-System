@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: fraud_detection_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: fraud_detection_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: ../
+      dockerfile: docker/api.Dockerfile
+    container_name: fraud_detection_api
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=development
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=fraud_detection_db
+      - DATABASE_URL=postgresql+asyncpg://postgres:postgres@postgres:5432/fraud_detection_db
+      - API_KEY=fraud_dev_sec_key
+    volumes:
+      - ../models:/app/models
+
+  dashboard:
+    build:
+      context: ../
+      dockerfile: docker/dashboard.Dockerfile
+    container_name: fraud_detection_dashboard
+    depends_on:
+      - api
+    ports:
+      - "8501:8501"
+    environment:
+      - BACKEND_API_URL=http://api:8000/api/v1
+      - API_KEY=fraud_dev_sec_key
+
+volumes:
+  postgres_data:
