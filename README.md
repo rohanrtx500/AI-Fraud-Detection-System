@@ -1,6 +1,6 @@
 # 🛡️ AI Fraud Detection & Risk Intelligence Platform
 
-A production-grade, end-to-end financial fraud detection platform combining real-time machine learning (XGBoost/Random Forest), Explainable AI (SHAP), multi-dimensional user behavioral profiling, and entity relationship network graphs (NetworkX).
+A production-grade, end-to-end financial fraud detection platform combining real-time machine learning (XGBoost/Random Forest), Explainable AI (SHAP), multi-dimensional user behavioral profiling, entity relationship network graphs (NetworkX), and **strict User Role-Based Access Control (RBAC)** with 100% disjoint role workspaces.
 
 ---
 
@@ -26,12 +26,19 @@ flowchart TD
 
 ## 🌟 Key Engineering Highlights
 
-### 1. Dual-Engine Risk Scoring
+### 1. User Role-Based Access Control (RBAC) & Disjoint Workspaces
+- **Cryptographic OAuth2 JWT Security**: Secures all API routes and dashboard pages with role validation (`CO-`, `AN-`, `AU-`).
+- **100% Disjoint Worksite Isolation**:
+  - **Analyst (`AN-7025`)**: Real-Time Risk Evaluation Center, Risk Factor Attribution, Entity Network Desk, Case Management Workspace.
+  - **Auditor (`AU-5265`)**: Executive Risk & Value Analytics, Model Health & Integrity, PDF & Multi-Sheet Excel Compliance Reports.
+  - **Compliance Officer (`CO-9921`)**: Traffic Ingestion & Volume Load Desk, Threat Intelligence Registry, Governance & Audit Ledgers.
+
+### 2. Dual-Engine Risk Scoring
 - **ML Classifier**: Calibrated XGBoost & Random Forest pipelines engineered for real-time probability outputs. Includes unsupervised Isolation Forests for zero-day threat detection.
 - **Business Rule Heuristics**: Custom scoring engine combining **Amount Risk**, **Frequency Risk**, **Location Risk**, and **Behavior Risk** into a unified score ($0 - 100$) mapped to Low, Medium, High, and Critical buckets.
 - **Max-Pool Override**: Weighted aggregations are protected by a max-pool coefficient to prevent critical sub-risk spikes from being diluted.
 
-### 2. Multi-Dimensional User Behavioral Profiling
+### 3. Multi-Dimensional User Behavioral Profiling
 - Tracks individual baseline vectors for all users (fit from training data or updated dynamically):
   - Geographic preferred countries/cities.
   - Device fingerprint baselines.
@@ -39,20 +46,16 @@ flowchart TD
   - Velocity/frequency intervals.
 - Computes deviations (such as Z-scores for amounts or unseen device flags) which feed directly into sub-risk overrides.
 
-### 3. Entity Graph Fraud Analysis
+### 4. Entity Graph Fraud Analysis
 - Models relationships as a multi-partite network connecting **Users (`usr_...`)**, **Devices (`dev_...`)**, **Cards (`card_...`)**, and **Merchants (`merch_...`)** via transaction edges.
 - Detects complex threat patterns:
   - **Card Sharing**: Credit cards linked to $>1$ user accounts (account takeover/compromised cards).
   - **Device Sharing**: Devices linked to $>2$ user accounts (fraud rings/botnets).
   - **Fraud Rings**: Tightly connected components with high fraud density.
 
-### 4. Explainable AI (XAI)
+### 5. Explainable AI (XAI) & Dynamic Reporting
 - Standard SHAP explanations run too slowly for real-time APIs. This platform utilizes `shap.TreeExplainer` cached directly on the compiled tree structures to deliver attributions in **sub-10ms**.
-- Sums categorical one-hot attributions back to the raw input features (e.g. mapping `currency_USD` and `currency_EUR` back to `currency`) and translates weights into plain English reason codes.
-
-### 5. Production-Ready API & Frontend Dashboard
-- **FastAPI Backend**: Standard FastAPI lifespan lifecycles, structured JSON logging using `structlog` for cloud aggregation, async database sessions via SQLAlchemy ORM, and `X-API-KEY` token authentication.
-- **Streamlit Analytics Center**: An executive dashboard featuring Plotly KPIs, geographic hop maps, an ingestion sandbox, and an interactive **Investigation Workspace** where compliance officers can view SHAP explainers and commit override audit resolutions.
+- Generates automated, downloadable **Executive PDF & Multi-Sheet Excel Reports** for compliance audits.
 
 ---
 
