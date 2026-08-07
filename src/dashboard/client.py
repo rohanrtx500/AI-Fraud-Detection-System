@@ -426,7 +426,7 @@ class FraudAPIClient:
             conn = sqlite3.connect(db_path)
             cur = conn.cursor()
             cur.execute(
-                "SELECT id, username, hashed_password, role, role_id FROM users WHERE role_id = ?",
+                "SELECT id, username, hashed_password, role, role_id FROM users WHERE LOWER(role_id) = LOWER(?)",
                 (role_id.strip(),),
             )
             row = cur.fetchone()

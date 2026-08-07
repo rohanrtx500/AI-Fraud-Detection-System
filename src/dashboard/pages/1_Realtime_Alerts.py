@@ -23,6 +23,13 @@ st.markdown(
 )
 
 # Initialize REST Client
+if "user_token" not in st.session_state and "session_token" in st.query_params:
+    st.session_state.user_token = st.query_params["session_token"]
+    st.session_state.user_role = st.query_params.get("role", "Analyst")
+    st.session_state.username = st.query_params.get("username", "User")
+    st.session_state.user_role_id = st.query_params.get("role_id", "N/A")
+    st.session_state.user_display_name = f"{st.session_state.username} ({st.session_state.user_role_id})"
+
 if "user_token" not in st.session_state:
     st.switch_page("App.py")
     st.stop()

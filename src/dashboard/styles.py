@@ -988,7 +988,8 @@ def render_custom_sidebar():
             del st.session_state.user_display_name
         if "active_scoring_result" in st.session_state:
             del st.session_state.active_scoring_result
-        st.rerun()
+        st.query_params.clear()
+        st.switch_page("App.py")
 
     return controls_container
 

@@ -46,10 +46,16 @@ ensure_backend_api()
 # Initialize client
 client = FraudAPIClient()
 
-# Shared Session Authentication (persisted in st.session_state)
-# Shared Session Authentication (persisted in st.session_state)
+# Shared Session Authentication (persisted in st.session_state & st.query_params across refreshes)
+if "user_token" not in st.session_state and "session_token" in st.query_params:
+    st.session_state.user_token = st.query_params["session_token"]
+    st.session_state.user_role = st.query_params.get("role", "Analyst")
+    st.session_state.username = st.query_params.get("username", "User")
+    st.session_state.user_role_id = st.query_params.get("role_id", "N/A")
+    st.session_state.user_display_name = f"{st.session_state.username} ({st.session_state.user_role_id})"
+
 if "user_token" not in st.session_state:
-    # Hide sidebar container and toggle arrow before login
+    # Hide top decoration & toolbar before login
     st.markdown(
         """
         <style>
@@ -97,6 +103,13 @@ if "user_token" not in st.session_state:
                             st.session_state.username = res["username"]
                             st.session_state.user_role_id = res.get("role_id") or "N/A"
                             st.session_state.user_display_name = f"{res['username']} ({st.session_state.user_role_id})"
+                            
+                            # Persist session to URL query params across browser refreshes
+                            st.query_params["session_token"] = res["access_token"]
+                            st.query_params["role"] = res["role"]
+                            st.query_params["username"] = res["username"]
+                            st.query_params["role_id"] = st.session_state.user_role_id
+                            
                             st.success(f"Session authenticated! Logged in as {res['username']}.")
                             st.rerun()
 

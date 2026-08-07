@@ -99,13 +99,16 @@ async def register(user_in: UserCreate, db: AsyncSession = Depends(get_db_sessio
     return new_user
 
 
+from sqlalchemy import func
+
 @router.post("/token", response_model=Token)
 async def login_for_access_token(
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: AsyncSession = Depends(get_db_session),
 ):
+    input_role_id = form_data.username.strip().lower()
     result = await db.execute(
-        select(User).where(User.role_id == form_data.username)
+        select(User).where(func.lower(User.role_id) == input_role_id)
     )
     user = result.scalars().first()
     if not user or not verify_password(form_data.password, user.hashed_password):
