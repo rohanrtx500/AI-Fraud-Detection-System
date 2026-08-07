@@ -138,7 +138,7 @@ def apply_custom_theme(glow_color="#0D1532"):
             border-right: 1px solid rgba(255, 255, 255, 0.05) !important;
         }
 
-        [data-testid="stSidebarNav"] {
+        [data-testid="stSidebarNavItems"], [data-testid="stSidebarNav"] ul {
             display: none !important;
         }
 
