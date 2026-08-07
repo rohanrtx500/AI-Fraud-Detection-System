@@ -59,7 +59,7 @@ if "user_token" not in st.session_state:
     st.markdown(
         """
         <style>
-            header, [data-testid="stHeader"], [data-testid="stDecoration"], #MainMenu, [data-testid="stToolbar"] {
+            [data-testid="stDecoration"], #MainMenu {
                 display: none !important;
                 visibility: hidden !important;
                 height: 0px !important;

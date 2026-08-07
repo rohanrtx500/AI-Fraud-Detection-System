@@ -62,45 +62,42 @@ def apply_custom_theme(glow_color="#0D1532"):
             background-color: transparent !important;
         }
 
-        /* Completely Nuke Top Gradient Line, Header Bar, and Three-Dots Toolbar */
-        header,
-        header *,
-        [data-testid="stHeader"],
-        [data-testid="stHeader"] *,
+        /* Top Decoration Line Removal */
         [data-testid="stDecoration"],
-        [data-testid="stDecoration"] *,
         div[data-testid="stDecoration"],
         div[class*="stDecoration"],
-        .stDecoration,
-        header::before,
-        [data-testid="stHeader"]::before,
-        [data-testid="stHeader"]::after {
+        .stDecoration {
             display: none !important;
             visibility: hidden !important;
             height: 0px !important;
             min-height: 0px !important;
             max-height: 0px !important;
             opacity: 0 !important;
-            pointer-events: none !important;
             background: none !important;
-            background-color: transparent !important;
-            background-image: none !important;
-            border: none !important;
-            box-shadow: none !important;
         }
 
         #MainMenu,
         [data-testid="stMainMenu"],
-        [data-testid="stToolbar"],
-        [data-testid="stElementToolbar"],
-        [data-testid="stStatusWidget"],
-        footer,
-        footer * {
+        footer {
             display: none !important;
             visibility: hidden !important;
             opacity: 0 !important;
             height: 0px !important;
-            pointer-events: none !important;
+        }
+
+        /* Ensure Sidebar & Sidebar Toggle Controls Are Always Visible */
+        [data-testid="stSidebar"] {
+            display: block !important;
+            visibility: visible !important;
+        }
+
+        [data-testid="collapsedControl"],
+        [data-testid="stSidebarCollapseButton"],
+        button[data-testid="baseButton-header"] {
+            display: flex !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            z-index: 999999 !important;
         }
 
         [data-testid="stAppViewContainer"] {
