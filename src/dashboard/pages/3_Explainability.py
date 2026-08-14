@@ -16,9 +16,6 @@ if "user_token" not in st.session_state:
     st.switch_page("App.py")
     st.stop()
 
-if st.session_state.user_role != "Analyst":
-    st.error("⚠️ Access Denied: This workspace is designated exclusively for Analyst users.")
-    st.stop()
 from src.dashboard.styles import render_custom_sidebar
 controls_container = render_custom_sidebar()
 

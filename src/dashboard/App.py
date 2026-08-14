@@ -80,66 +80,36 @@ if "user_token" not in st.session_state:
 
     auth_col1, auth_col2, auth_col3 = st.columns([0.5, 3, 0.5])
     with auth_col2:
-        tab_quick, tab_login, tab_register = st.tabs(["⚡ 1-Click Quick Login", "🔑 Log In", "📝 Register User"])
-
-        with tab_quick:
-            st.write("⚡ **Recruiter & Fast-Test Demo Access**")
-            st.caption("Click any role button below to log in instantly without typing credentials:")
-            col_q1, col_q2, col_q3 = st.columns(3)
-            with col_q1:
-                if st.button("🛡️ Compliance Officer", use_container_width=True, help="Test Volume Load Desk, Threat Intel & Governance"):
-                    res = client.login_user("CO-9921", "Password123!")
-                    if "access_token" in res:
-                        st.session_state.user_token = res["access_token"]
-                        st.session_state.user_role = res["role"]
-                        st.session_state.username = res["username"]
-                        st.session_state.user_role_id = res.get("role_id") or "CO-9921"
-                        st.session_state.user_display_name = f"{res['username']} ({st.session_state.user_role_id})"
-                        st.query_params["session_token"] = res["access_token"]
-                        st.query_params["role"] = res["role"]
-                        st.query_params["username"] = res["username"]
-                        st.query_params["role_id"] = st.session_state.user_role_id
-                        st.rerun()
-            with col_q2:
-                if st.button("🚨 Fraud Analyst", use_container_width=True, help="Test Risk Evaluation, SHAP Drivers & Entity Graph"):
-                    res = client.login_user("AN-7025", "Password123!")
-                    if "access_token" in res:
-                        st.session_state.user_token = res["access_token"]
-                        st.session_state.user_role = res["role"]
-                        st.session_state.username = res["username"]
-                        st.session_state.user_role_id = res.get("role_id") or "AN-7025"
-                        st.session_state.user_display_name = f"{res['username']} ({st.session_state.user_role_id})"
-                        st.query_params["session_token"] = res["access_token"]
-                        st.query_params["role"] = res["role"]
-                        st.query_params["username"] = res["username"]
-                        st.query_params["role_id"] = st.session_state.user_role_id
-                        st.rerun()
-            with col_q3:
-                if st.button("📊 Risk Auditor", use_container_width=True, help="Test Platform Analytics, Model Health & PDF Exports"):
-                    res = client.login_user("AU-5265", "Password123!")
-                    if "access_token" in res:
-                        st.session_state.user_token = res["access_token"]
-                        st.session_state.user_role = res["role"]
-                        st.session_state.username = res["username"]
-                        st.session_state.user_role_id = res.get("role_id") or "AU-5265"
-                        st.session_state.user_display_name = f"{res['username']} ({st.session_state.user_role_id})"
-                        st.query_params["session_token"] = res["access_token"]
-                        st.query_params["role"] = res["role"]
-                        st.query_params["username"] = res["username"]
-                        st.query_params["role_id"] = st.session_state.user_role_id
-                        st.rerun()
+        tab_login, tab_register = st.tabs(["🔑 Universal Log In", "📝 Register New Account"])
 
         with tab_login:
+            st.write("🔑 **Universal Risk Cockpit Access**")
+            
+            # 1-Click Fast Login for Recruiters / Testers
+            if st.button("🚀 1-Click Instant Demo Login (Recruiter / Tester Access)", type="primary", use_container_width=True):
+                res = client.login_user("CO-9921", "Password123!")
+                if "access_token" in res:
+                    st.session_state.user_token = res["access_token"]
+                    st.session_state.user_role = res["role"]
+                    st.session_state.username = res["username"]
+                    st.session_state.user_role_id = res.get("role_id") or "CO-9921"
+                    st.session_state.user_display_name = f"{res['username']} ({st.session_state.user_role_id})"
+                    st.query_params["session_token"] = res["access_token"]
+                    st.query_params["role"] = res["role"]
+                    st.query_params["username"] = res["username"]
+                    st.query_params["role_id"] = st.session_state.user_role_id
+                    st.rerun()
+
+            st.markdown("<div style='text-align: center; color: #64748B; margin: 10px 0;'>— OR ENTER YOUR CREDENTIALS —</div>", unsafe_allow_html=True)
             with st.form("login_form"):
-                st.write("🔑 **Risk Platform Session Log In**")
                 role_id_input = st.text_input(
-                    "Unique Role ID", placeholder="e.g. CO-1234, AN-5678"
+                    "User ID / Account ID", placeholder="e.g. CO-9921, AN-7025, or your registered ID"
                 )
                 password = st.text_input("Password", type="password", placeholder="••••••••")
-                login_btn = st.form_submit_button("Authenticate Session")
+                login_btn = st.form_submit_button("Authenticate & Enter System", use_container_width=True)
                 if login_btn:
                     if not role_id_input or not password:
-                        st.error("Please provide Role ID and password.")
+                        st.error("Please provide User ID and password.")
                     else:
                         res = client.login_user(role_id_input.strip(), password)
                         if "error" in res:
@@ -157,7 +127,7 @@ if "user_token" not in st.session_state:
                             st.query_params["username"] = res["username"]
                             st.query_params["role_id"] = st.session_state.user_role_id
                             
-                            st.success(f"Session authenticated! Logged in as {res['username']}.")
+                            st.success(f"Session authenticated! Welcome {res['username']}.")
                             st.rerun()
 
         with tab_register:
@@ -171,9 +141,9 @@ if "user_token" not in st.session_state:
                     "Password requirements: min 8 characters, at least one uppercase letter, one lowercase letter, one number, and one special character."
                 )
                 new_role = st.selectbox(
-                    "Designated User Role", ["Compliance Officer", "Analyst", "Auditor"]
+                    "Account Type", ["Compliance Officer", "Analyst", "Auditor"]
                 )
-                register_btn = st.form_submit_button("Register Account")
+                register_btn = st.form_submit_button("Register Account", use_container_width=True)
                 if register_btn:
                     if not new_username or not new_password:
                         st.error("Please provide both name and password.")

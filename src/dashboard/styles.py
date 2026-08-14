@@ -919,70 +919,19 @@ def render_custom_sidebar():
     controls_container = st.sidebar.container()
     profile_container = st.sidebar.container()
 
-    # Render Navigation links
+    # Render Navigation links for all pages (Universal Access)
     nav_container.markdown("### 🧭 Navigation")
-    
-    # Recruiter / Fast Testing Role Switcher
-    from src.dashboard.client import FraudAPIClient
-    client = FraudAPIClient()
-    
-    role_accounts = {
-        "Compliance Officer": {"role_id": "CO-9921", "label": "🛡️ Compliance Officer"},
-        "Analyst": {"role_id": "AN-7025", "label": "🚨 Fraud Analyst"},
-        "Auditor": {"role_id": "AU-5265", "label": "📊 Risk Auditor"},
-    }
-
-    current_role = st.session_state.get("user_role", "Compliance Officer")
-    role_names = list(role_accounts.keys())
-    current_idx = role_names.index(current_role) if current_role in role_names else 0
-
-    selected_role_name = nav_container.selectbox(
-        "⚡ Quick Role Switcher",
-        options=role_names,
-        index=current_idx,
-        format_func=lambda r: role_accounts[r]["label"],
-        key="sidebar_role_switcher_select",
-        help="Switch user roles instantly with 1-click to test all workspaces!"
-    )
-
-    if selected_role_name != current_role:
-        target_info = role_accounts[selected_role_name]
-        res = client.login_user(target_info["role_id"], "Password123!")
-        if "access_token" in res:
-            st.session_state.user_token = res["access_token"]
-            st.session_state.user_role = res["role"]
-            st.session_state.username = res["username"]
-            st.session_state.user_role_id = res.get("role_id") or target_info["role_id"]
-            st.session_state.user_display_name = f"{res['username']} ({st.session_state.user_role_id})"
-            
-            st.query_params["session_token"] = res["access_token"]
-            st.query_params["role"] = res["role"]
-            st.query_params["username"] = res["username"]
-            st.query_params["role_id"] = st.session_state.user_role_id
-            st.rerun()
-
-    nav_container.markdown("<br>", unsafe_allow_html=True)
-    
-    # Base link that everyone gets
     nav_container.page_link("App.py", label="Home Cockpit", icon="🛡️")
-    
-    role = st.session_state.get("user_role", "Compliance Officer")
-    if role == "Compliance Officer":
-        # Compliance Officer: Traffic Load Desk, Threat Intelligence, and GRC Governance
-        nav_container.page_link("pages/7_Simulation.py", label="Volume Load Control Desk", icon="⚡")
-        nav_container.page_link("pages/8_Threat_Intel.py", label="Threat Intelligence Registry", icon="📡")
-        nav_container.page_link("pages/9_Governance.py", label="Governance & Audit Ledgers", icon="⚖️")
-    elif role == "Analyst":
-        # Analyst: Risk Evaluation, Factor Attribution, Entity Relationship Networks, and Case Management
-        nav_container.page_link("pages/1_Realtime_Alerts.py", label="Risk Evaluation Center", icon="🚨")
-        nav_container.page_link("pages/3_Explainability.py", label="Risk Factor Attribution", icon="🔎")
-        nav_container.page_link("pages/3_Graph_Analysis.py", label="Entity Relationship Network", icon="🕸️")
-        nav_container.page_link("pages/4_Cases.py", label="Case Management Workspace", icon="💼")
-    elif role == "Auditor":
-        # Auditor: Risk & Value Analytics, Model Integrity Checks, and Executive Compliance Reports
-        nav_container.page_link("pages/2_Analytics.py", label="Risk & Value Analytics", icon="📊")
-        nav_container.page_link("pages/5_Monitoring.py", label="Model Health & Integrity", icon="🔍")
-        nav_container.page_link("pages/6_Reports.py", label="Executive Compliance Reports", icon="📑")
+    nav_container.page_link("pages/1_Realtime_Alerts.py", label="Risk Evaluation Center", icon="🚨")
+    nav_container.page_link("pages/2_Analytics.py", label="Risk & Value Analytics", icon="📊")
+    nav_container.page_link("pages/3_Explainability.py", label="Risk Factor Attribution", icon="🔎")
+    nav_container.page_link("pages/3_Graph_Analysis.py", label="Entity Relationship Network", icon="🕸️")
+    nav_container.page_link("pages/4_Cases.py", label="Case Management Workspace", icon="💼")
+    nav_container.page_link("pages/5_Monitoring.py", label="Model Health & Integrity", icon="🔍")
+    nav_container.page_link("pages/6_Reports.py", label="Executive Compliance Reports", icon="📑")
+    nav_container.page_link("pages/7_Simulation.py", label="Volume Load Control Desk", icon="⚡")
+    nav_container.page_link("pages/8_Threat_Intel.py", label="Threat Intelligence Registry", icon="📡")
+    nav_container.page_link("pages/9_Governance.py", label="Governance & Audit Ledgers", icon="⚖️")
 
     nav_container.markdown("---")
 

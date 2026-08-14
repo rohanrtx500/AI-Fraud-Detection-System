@@ -38,23 +38,6 @@ if "user_token" not in st.session_state:
     st.stop()
 
 client = FraudAPIClient()
-
-if st.session_state.user_role != "Compliance Officer":
-    st.error("⚠️ Access Denied: This workspace is designated exclusively for Compliance Officer users.")
-    if st.button("⚡ Switch to Compliance Officer Role (1-Click)", type="primary"):
-        res = client.login_user("CO-9921", "Password123!")
-        if "access_token" in res:
-            st.session_state.user_token = res["access_token"]
-            st.session_state.user_role = res["role"]
-            st.session_state.username = res["username"]
-            st.session_state.user_role_id = res.get("role_id") or "CO-9921"
-            st.session_state.user_display_name = f"{res['username']} ({st.session_state.user_role_id})"
-            st.query_params["session_token"] = res["access_token"]
-            st.query_params["role"] = res["role"]
-            st.query_params["username"] = res["username"]
-            st.query_params["role_id"] = st.session_state.user_role_id
-            st.rerun()
-    st.stop()
 client.set_token(st.session_state.user_token)
 
 from src.dashboard.styles import render_custom_sidebar
@@ -85,17 +68,9 @@ if controls_container:
     delay = controls_container.slider("Inter-transaction Delay (seconds)", 0.0, 2.0, 0.5)
 
     engine = SyntheticFraudEngine()
+    run_sim = controls_container.button("Launch Traffic Stream", type="primary", use_container_width=True)
 
-    role = st.session_state.get("user_role", "Compliance Officer")
-    if role != "Compliance Officer":
-        controls_container.warning(
-            "⚠️ Access Denied: Volume Load Desk execution is restricted to Compliance Officers."
-        )
-        st.info("Select a scenario and toggle user role in the sidebar to test.")
-    else:
-        run_sim = controls_container.button("Launch Traffic Stream", type="primary", use_container_width=True)
-
-if role == "Compliance Officer" and run_sim:
+if run_sim:
     st.write("---")
     st.subheader(f"⚡ Processing Traffic Stream: {scenario}")
 

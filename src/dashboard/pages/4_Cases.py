@@ -17,9 +17,6 @@ if "user_token" not in st.session_state:
     st.switch_page("App.py")
     st.stop()
 
-if st.session_state.user_role != "Analyst":
-    st.error("⚠️ Access Denied: This workspace is designated exclusively for Analyst users.")
-    st.stop()
 client = FraudAPIClient()
 client.set_token(st.session_state.user_token)
 
