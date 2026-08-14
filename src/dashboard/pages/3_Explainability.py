@@ -20,11 +20,11 @@ from src.dashboard.styles import render_custom_sidebar
 controls_container = render_custom_sidebar()
 
 st.markdown(
-    "<h1 class='premium-title'>🔎 Risk Factor Attribution Desk</h1>",
+    "<h1 class='premium-title'>🔎 Risk Decision Explanation Desk</h1>",
     unsafe_allow_html=True,
 )
 st.markdown(
-    "<p class='premium-sub'>Examine key risk factors influencing prediction scores and inspect decision driver attributions.</p>",
+    "<p class='premium-sub'>Clear breakdown explaining why each payment was flagged or approved.</p>",
     unsafe_allow_html=True,
 )
 

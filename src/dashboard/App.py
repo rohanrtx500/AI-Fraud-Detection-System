@@ -70,11 +70,11 @@ if "user_token" not in st.session_state:
     )
 
     st.markdown(
-        "<h1 class='premium-title' style='text-align: center; margin-top: 50px;'>🛡️ AI RISK COCKPIT</h1>",
+        "<h1 class='premium-title' style='text-align: center; margin-top: 50px;'>🛡️ FINANCIAL RISK CONTROL ROOM</h1>",
         unsafe_allow_html=True,
     )
     st.markdown(
-        "<p class='premium-sub' style='text-align: center; margin-bottom: 30px;'>Enterprise Financial Fraud Intelligence Control Room</p>",
+        "<p class='premium-sub' style='text-align: center; margin-bottom: 30px;'>Real-Time Fraud Prevention & Payment Protection System</p>",
         unsafe_allow_html=True,
     )
 

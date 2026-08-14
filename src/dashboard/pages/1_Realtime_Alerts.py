@@ -14,11 +14,11 @@ st.set_page_config(page_title="Investigation Workspace", page_icon="🚨", layou
 apply_custom_theme("#2A0A15")
 
 st.markdown(
-    "<h1 class='premium-title'>🚨 Real-Time Risk Evaluation Center</h1>",
+    "<h1 class='premium-title'>🚨 Live Payment Evaluation Center</h1>",
     unsafe_allow_html=True,
 )
 st.markdown(
-    "<p class='premium-sub'>Evaluate live transaction risk profiles and perform compliance audits on high-risk records.</p>",
+    "<p class='premium-sub'>Review live customer payments in real time and inspect flagged high-risk transactions.</p>",
     unsafe_allow_html=True,
 )
 

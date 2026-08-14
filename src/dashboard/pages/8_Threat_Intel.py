@@ -10,11 +10,11 @@ st.set_page_config(page_title="Threat Intel Blacklist", page_icon="📡", layout
 apply_custom_theme("#320A0A")
 
 st.markdown(
-    "<h1 class='premium-title'>📡 Threat Intelligence & Risk Multipliers</h1>",
+    "<h1 class='premium-title'>📡 Blocked Threat Manager</h1>",
     unsafe_allow_html=True,
 )
 st.markdown(
-    "<p class='premium-sub'>Register compromised threat vectors (IPs, devices, cards, merchant locations) to calculate real-time risk multipliers.</p>",
+    "<p class='premium-sub'>View and manage blocked internet addresses, flagged device IDs, and blacklisted accounts.</p>",
     unsafe_allow_html=True,
 )
 

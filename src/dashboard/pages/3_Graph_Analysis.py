@@ -19,11 +19,11 @@ from src.dashboard.styles import render_custom_sidebar
 controls_container = render_custom_sidebar()
 
 st.markdown(
-    "<h1 class='premium-title'>🕸️ Entity Relationship Network Desk</h1>",
+    "<h1 class='premium-title'>🕸️ Connected Fraud Ring Inspector</h1>",
     unsafe_allow_html=True,
 )
 st.markdown(
-    "<p class='premium-sub'>Explore network connections across users, devices, and merchants to identify coordinated rings and risk propagation.</p>",
+    "<p class='premium-sub'>Discover hidden connections between cards, devices, and locations to uncover organized fraud rings.</p>",
     unsafe_allow_html=True,
 )
 

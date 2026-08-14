@@ -19,10 +19,10 @@ st.set_page_config(
 apply_custom_theme("#2E1E0A")
 
 st.markdown(
-    "<h1 class='premium-title'>⚡ Traffic Ingestion & Volume Load Desk</h1>", unsafe_allow_html=True
+    "<h1 class='premium-title'>⚡ Traffic & Stress Test Desk</h1>", unsafe_allow_html=True
 )
 st.markdown(
-    "<p class='premium-sub'>Stream real-time high-volume traffic profiles to evaluate system throughput, scoring capacity, and risk decision bounds.</p>",
+    "<p class='premium-sub'>Run simulated payment streams to test system speed, load handling, and security rules.</p>",
     unsafe_allow_html=True,
 )
 

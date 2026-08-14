@@ -10,10 +10,10 @@ st.set_page_config(page_title="Governance & Compliance Center", page_icon="⚖�
 apply_custom_theme("#1F2421")
 
 st.markdown(
-    "<h1 class='premium-title'>⚖️ Enterprise Governance, Risk & Compliance (GRC)</h1>", unsafe_allow_html=True
+    "<h1 class='premium-title'>⚖️ System Activity & Audit Logs</h1>", unsafe_allow_html=True
 )
 st.markdown(
-    "<p class='premium-sub'>System audit trail logs, override resolution tracking, and Role-Based Access Control (RBAC) policy enforcement.</p>",
+    "<p class='premium-sub'>Complete record of all team actions, reviewer decisions, and rule updates.</p>",
     unsafe_allow_html=True,
 )
 
