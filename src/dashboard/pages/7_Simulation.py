@@ -109,10 +109,26 @@ if run_sim:
                 f"Scoring transaction {idx+1}/{len(events)}: ID={event['transaction_id']}..."
             )
 
-            # Format timestamp as string for JSON serialization
+            # Format timestamp as string and ensure required schema fields exist
             payload = event.copy()
-            if isinstance(payload["timestamp"], datetime):
+            if isinstance(payload.get("timestamp"), datetime):
                 payload["timestamp"] = payload["timestamp"].isoformat()
+
+            import random
+            if "receiver_id" not in payload or not payload["receiver_id"]:
+                payload["receiver_id"] = f"merch_{random.randint(1000, 9999)}"
+            if "currency" not in payload or not payload["currency"]:
+                payload["currency"] = "USD"
+            if "merchant_category" not in payload or not payload["merchant_category"]:
+                payload["merchant_category"] = "retail"
+            if "location_country" not in payload or not payload["location_country"]:
+                payload["location_country"] = "US"
+            if "location_city" not in payload or not payload["location_city"]:
+                payload["location_city"] = "New York"
+            if "device_id" not in payload or not payload["device_id"]:
+                payload["device_id"] = f"dev_sim_{random.randint(100, 999)}"
+            if "ip_address" not in payload or not payload["ip_address"]:
+                payload["ip_address"] = f"192.168.1.{random.randint(1, 254)}"
 
             # Post transaction to API endpoint
             res = client.score_transaction(payload)

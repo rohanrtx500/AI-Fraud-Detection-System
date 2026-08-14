@@ -116,6 +116,11 @@ class FraudInferenceEngine:
     """
 
     def __init__(self, models_dir: str = "models/registry"):
+        if not os.path.isabs(models_dir):
+            base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+            alt_path = os.path.join(base_dir, models_dir)
+            if os.path.exists(alt_path):
+                models_dir = alt_path
         self.models_dir = models_dir
         self.loaded_models: dict[str, joblib.Pipeline] = {}
         self.scoring_engine = FraudRiskScoringEngine()
@@ -130,9 +135,14 @@ class FraudInferenceEngine:
             model_path = os.path.join(self.models_dir, filename)
 
             if not os.path.exists(model_path):
-                raise FileNotFoundError(f"Selected model '{model_type}' not found at: {model_path}")
+                base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+                fallback_path = os.path.join(base_dir, "models", "registry", filename)
+                if os.path.exists(fallback_path):
+                    model_path = fallback_path
+                else:
+                    raise FileNotFoundError(f"Selected model '{model_type}' not found at: {model_path}")
 
-            print(f"Loading '{model_type}' pipeline into memory...")
+            print(f"Loading '{model_type}' pipeline into memory from {model_path}...")
             self.loaded_models[model_type] = joblib.load(model_path)
 
         return self.loaded_models[model_type]
