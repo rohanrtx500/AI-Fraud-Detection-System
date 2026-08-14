@@ -34,10 +34,24 @@ if "user_token" not in st.session_state:
     st.switch_page("App.py")
     st.stop()
 
-if st.session_state.user_role != "Analyst":
-    st.error("⚠️ Access Denied: This workspace is designated exclusively for Analyst users.")
-    st.stop()
 client = FraudAPIClient()
+
+if st.session_state.user_role != "Analyst":
+    st.error("⚠️ Access Denied: This workspace is designated exclusively for Fraud Analyst users.")
+    if st.button("⚡ Switch to Fraud Analyst Role (1-Click)", type="primary"):
+        res = client.login_user("AN-7025", "Password123!")
+        if "access_token" in res:
+            st.session_state.user_token = res["access_token"]
+            st.session_state.user_role = res["role"]
+            st.session_state.username = res["username"]
+            st.session_state.user_role_id = res.get("role_id") or "AN-7025"
+            st.session_state.user_display_name = f"{res['username']} ({st.session_state.user_role_id})"
+            st.query_params["session_token"] = res["access_token"]
+            st.query_params["role"] = res["role"]
+            st.query_params["username"] = res["username"]
+            st.query_params["role_id"] = st.session_state.user_role_id
+            st.rerun()
+    st.stop()
 client.set_token(st.session_state.user_token)
 
 from src.dashboard.styles import render_custom_sidebar

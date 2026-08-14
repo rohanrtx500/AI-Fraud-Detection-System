@@ -78,9 +78,56 @@ if "user_token" not in st.session_state:
         unsafe_allow_html=True,
     )
 
-    auth_col1, auth_col2, auth_col3 = st.columns([1, 2, 1])
+    auth_col1, auth_col2, auth_col3 = st.columns([0.5, 3, 0.5])
     with auth_col2:
-        tab_login, tab_register = st.tabs(["🔑 Log In", "📝 Register User"])
+        tab_quick, tab_login, tab_register = st.tabs(["⚡ 1-Click Quick Login", "🔑 Log In", "📝 Register User"])
+
+        with tab_quick:
+            st.write("⚡ **Recruiter & Fast-Test Demo Access**")
+            st.caption("Click any role button below to log in instantly without typing credentials:")
+            col_q1, col_q2, col_q3 = st.columns(3)
+            with col_q1:
+                if st.button("🛡️ Compliance Officer", use_container_width=True, help="Test Volume Load Desk, Threat Intel & Governance"):
+                    res = client.login_user("CO-9921", "Password123!")
+                    if "access_token" in res:
+                        st.session_state.user_token = res["access_token"]
+                        st.session_state.user_role = res["role"]
+                        st.session_state.username = res["username"]
+                        st.session_state.user_role_id = res.get("role_id") or "CO-9921"
+                        st.session_state.user_display_name = f"{res['username']} ({st.session_state.user_role_id})"
+                        st.query_params["session_token"] = res["access_token"]
+                        st.query_params["role"] = res["role"]
+                        st.query_params["username"] = res["username"]
+                        st.query_params["role_id"] = st.session_state.user_role_id
+                        st.rerun()
+            with col_q2:
+                if st.button("🚨 Fraud Analyst", use_container_width=True, help="Test Risk Evaluation, SHAP Drivers & Entity Graph"):
+                    res = client.login_user("AN-7025", "Password123!")
+                    if "access_token" in res:
+                        st.session_state.user_token = res["access_token"]
+                        st.session_state.user_role = res["role"]
+                        st.session_state.username = res["username"]
+                        st.session_state.user_role_id = res.get("role_id") or "AN-7025"
+                        st.session_state.user_display_name = f"{res['username']} ({st.session_state.user_role_id})"
+                        st.query_params["session_token"] = res["access_token"]
+                        st.query_params["role"] = res["role"]
+                        st.query_params["username"] = res["username"]
+                        st.query_params["role_id"] = st.session_state.user_role_id
+                        st.rerun()
+            with col_q3:
+                if st.button("📊 Risk Auditor", use_container_width=True, help="Test Platform Analytics, Model Health & PDF Exports"):
+                    res = client.login_user("AU-5265", "Password123!")
+                    if "access_token" in res:
+                        st.session_state.user_token = res["access_token"]
+                        st.session_state.user_role = res["role"]
+                        st.session_state.username = res["username"]
+                        st.session_state.user_role_id = res.get("role_id") or "AU-5265"
+                        st.session_state.user_display_name = f"{res['username']} ({st.session_state.user_role_id})"
+                        st.query_params["session_token"] = res["access_token"]
+                        st.query_params["role"] = res["role"]
+                        st.query_params["username"] = res["username"]
+                        st.query_params["role_id"] = st.session_state.user_role_id
+                        st.rerun()
 
         with tab_login:
             with st.form("login_form"):

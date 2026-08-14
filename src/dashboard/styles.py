@@ -922,6 +922,47 @@ def render_custom_sidebar():
     # Render Navigation links
     nav_container.markdown("### 🧭 Navigation")
     
+    # Recruiter / Fast Testing Role Switcher
+    from src.dashboard.client import FraudAPIClient
+    client = FraudAPIClient()
+    
+    role_accounts = {
+        "Compliance Officer": {"role_id": "CO-9921", "label": "🛡️ Compliance Officer"},
+        "Analyst": {"role_id": "AN-7025", "label": "🚨 Fraud Analyst"},
+        "Auditor": {"role_id": "AU-5265", "label": "📊 Risk Auditor"},
+    }
+
+    current_role = st.session_state.get("user_role", "Compliance Officer")
+    role_names = list(role_accounts.keys())
+    current_idx = role_names.index(current_role) if current_role in role_names else 0
+
+    selected_role_name = nav_container.selectbox(
+        "⚡ Quick Role Switcher",
+        options=role_names,
+        index=current_idx,
+        format_func=lambda r: role_accounts[r]["label"],
+        key="sidebar_role_switcher_select",
+        help="Switch user roles instantly with 1-click to test all workspaces!"
+    )
+
+    if selected_role_name != current_role:
+        target_info = role_accounts[selected_role_name]
+        res = client.login_user(target_info["role_id"], "Password123!")
+        if "access_token" in res:
+            st.session_state.user_token = res["access_token"]
+            st.session_state.user_role = res["role"]
+            st.session_state.username = res["username"]
+            st.session_state.user_role_id = res.get("role_id") or target_info["role_id"]
+            st.session_state.user_display_name = f"{res['username']} ({st.session_state.user_role_id})"
+            
+            st.query_params["session_token"] = res["access_token"]
+            st.query_params["role"] = res["role"]
+            st.query_params["username"] = res["username"]
+            st.query_params["role_id"] = st.session_state.user_role_id
+            st.rerun()
+
+    nav_container.markdown("<br>", unsafe_allow_html=True)
+    
     # Base link that everyone gets
     nav_container.page_link("App.py", label="Home Cockpit", icon="🛡️")
     
